@@ -85,8 +85,10 @@ export default function BoardsList({ session }: BoardsListProps) {
     };
 
     return (
-        <div className="h-[100vh]">
-            {!isLoading && (
+        <div className="md:h-[100vh] h-[25vh]">
+            {isLoading ? (
+                <p>Loading...</p>
+            ) : (
                 <div>
                     <div className="flex justify-between items-center">
                         <div className="flex gap-2">

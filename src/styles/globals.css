@@ -59,7 +59,7 @@
 }
 
 .tiptap {
-    @apply focus:outline-0 focus:border-0 min-h-60;
+    @apply focus:outline-0 focus:border-0 min-h-60 text-foreground first:mt-0;
 
     h1 {
         @apply scroll-m-20 text-3xl font-extrabold tracking-tight;
@@ -77,8 +77,45 @@
         @apply scroll-m-20 text-lg font-semibold tracking-tight;
     }
 
-    .code-highlight {
+    hr {
+        @apply border-t-[1px] border-foreground/10 cursor-pointer my-8;
+
+        &.ProseMirror-selectednode {
+            @apply border-primary;
+        }
+    }
+
+    ul {
+        @apply list-disc list-outside [&_ul]:list-[revert];
+    }
+
+    ol {
+        @apply list-decimal;
+    }
+
+    ul,
+    ol {
+        @apply px-4;
+
+        li p {
+            @apply my-1;
+        }
+    }
+
+    a {
+        @apply text-primary cursor-pointer hover:underline;
+    }
+
+    blockquote {
+        @apply border-l-[3px] border-l-foreground/10 my-6 pl-4;
+    }
+
+    .inline-code-highlight {
         @apply bg-primary/70 rounded-[0.4rem] py-[0.10em] px-[0.20em];
+    }
+
+    .code-block-highlight {
+        @apply bg-foreground/5 rounded-[0.4rem] p-2 border-2 border-dashed;
     }
 }
 

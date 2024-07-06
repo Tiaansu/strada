@@ -27,7 +27,7 @@ export default async function BoardPage({ params }: BoardPageProps) {
     if (!session?.user) return;
 
     return (
-        <main className="sm:ml-[240px] h-[100vh] p-4">
+        <main className="md:ml-[240px] h-[100vh] p-4">
             <Board boardId={params.boardId} session={session} />
         </main>
     );

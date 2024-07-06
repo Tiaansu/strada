@@ -28,28 +28,13 @@ export default async function LoggedInPage() {
 
     const boards = await getBoard(user.id!);
 
+    if (boards.length) {
+        redirect(`${DEFAULT_LOGIN_REDIRECT}/board/${boards[0].id}`);
+    }
+
     return (
-        <main
-            className={cn(
-                'h-screen sm:ml-[240px] p-4',
-                !!!boards.length ? 'flex items-center justify-center' : null
-            )}
-        >
-            {!!!boards.length ? (
-                <StartBoard />
-            ) : (
-                <ul>
-                    {boards.map((board) => (
-                        <li key={board.id}>
-                            <Link
-                                href={`${DEFAULT_LOGIN_REDIRECT}/board/${board.id}`}
-                            >
-                                {board.icon} {board.title}
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            )}
+        <main className="h-screen md:ml-[240px] p-4 flex items-center justify-center">
+            <StartBoard />
         </main>
     );
 }

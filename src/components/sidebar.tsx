@@ -13,7 +13,7 @@ interface SidebarProps {
 
 export default function Sidebar({ session }: SidebarProps) {
     return (
-        <aside className="fixed left-0 h-[100vh] w-[240px] px-5 py-6 border-r border-2 max-sm:hidden">
+        <aside className="fixed left-0 h-[100vh] w-[240px] px-5 py-6 border-r border-2 max-md:hidden">
             <div className="flex justify-between gap-3 mb-9">
                 <Link href={DEFAULT_LOGIN_REDIRECT}>
                     <div className="flex justify-center items-center gap-2 truncate">

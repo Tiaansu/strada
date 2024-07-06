@@ -36,6 +36,7 @@ export default function EmojiPicker(props: EmojiPickerProps) {
                     value={props.selectedIcon}
                     className="cursor-pointer border-none text-5xl w-24 h-16 focus-visible:ring-0"
                     onClick={() => setIsShowPicker(true)}
+                    onChange={() => {}}
                     placeholder="🔥"
                 />
                 {isShowPicker && (

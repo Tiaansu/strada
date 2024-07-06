@@ -22,6 +22,7 @@ import { useEffect, useState, useTransition } from 'react';
 import KanbanBoard from './kanban';
 import { ExtendedSection } from '@/types';
 import TextareaAutoSize from 'react-textarea-autosize';
+import MobileBoardsList from './mobile-boards-list';
 
 interface BoardProps {
     boardId: string;
@@ -48,7 +49,11 @@ export default function Board({ session, boardId }: BoardProps) {
             const res = await getBoardById(session.user?.id!, boardId);
 
             if (res.error) {
-                alert(res.error);
+                toast({
+                    variant: 'destructive',
+                    title: 'Uh-oh! Something went wrong.',
+                    description: res.error,
+                });
                 router.replace(DEFAULT_LOGIN_REDIRECT);
             }
 
@@ -82,12 +87,14 @@ export default function Board({ session, boardId }: BoardProps) {
             }
 
             const newList = boards.filter((board) => board.id !== boardId);
-            dispatch(setBoards(newList));
             if (!newList.length) {
-                redirect(DEFAULT_LOGIN_REDIRECT);
+                router.replace(DEFAULT_LOGIN_REDIRECT);
             } else {
-                redirect(`${DEFAULT_LOGIN_REDIRECT}/board/${newList[0].id}`);
+                router.replace(
+                    `${DEFAULT_LOGIN_REDIRECT}/board/${newList[0].id}`
+                );
             }
+            dispatch(setBoards(newList));
         });
     };
 
@@ -172,36 +179,51 @@ export default function Board({ session, boardId }: BoardProps) {
 
             <div className="p-10 h-[93vh]">
                 <Skeleton className="w-14 h-14 rounded-md bg-zinc-600" />
-                <Skeleton className="sm:w-[100vh - 240px] h-12 bg-zinc-600" />
-                <Skeleton className="sm:w-[100vh - 240px] h-60 bg-zinc-600" />
+                <Skeleton className="md:w-[calc(100vh_-_240px)] h-12 bg-zinc-600" />
+                <Skeleton className="md:w-[calc(100vh_-_240px)] h-60 bg-zinc-600" />
             </div>
         </>
     ) : (
         <>
-            <Button
-                variant="destructive"
-                onClick={deleteBoardId}
-                disabled={loading}
-                type="button"
-                title="Delete board"
-            >
-                {loading ? (
-                    <div className="flex gap-2 items-center">
-                        <ReloadIcon className="w-4 h-4 animate-spin" />
-                        Deleting...
-                    </div>
-                ) : (
-                    <>Delete Board</>
-                )}
-            </Button>
+            <div className="flex justify-between items-center">
+                <MobileBoardsList session={session} />
+                <Button
+                    variant="destructive"
+                    onClick={deleteBoardId}
+                    disabled={loading}
+                    type="button"
+                    title="Delete board"
+                >
+                    {loading ? (
+                        <div className="flex gap-2 items-center">
+                            <ReloadIcon className="w-4 h-4 animate-spin" />
+                            Deleting...
+                        </div>
+                    ) : (
+                        <>Delete Board</>
+                    )}
+                </Button>
+            </div>
 
             <div className="p-10 h-[93vh]">
-                <EmojiPicker selectedIcon={icon} onIconChange={onIconChange} />
+                {loading ? (
+                    <Input
+                        disabled
+                        value={icon}
+                        className="cursor-pointer border-none text-5xl w-24 h-16 focus-visible:ring-0"
+                    />
+                ) : (
+                    <EmojiPicker
+                        selectedIcon={icon}
+                        onIconChange={onIconChange}
+                    />
+                )}
                 <Input
                     value={title}
                     onChange={updateTitle}
                     placeholder="Untitled"
-                    className="sm:w-[100vh - 240px] text-4xl h-12 cursor-pointer border-none focus-visible:ring-0 truncate"
+                    className="md:w-[calc(100vh_-_240px)] text-4xl h-12 cursor-pointer border-none focus-visible:ring-0 truncate"
+                    disabled={loading}
                 />
                 <TextareaAutoSize
                     rows={2}
@@ -209,10 +231,11 @@ export default function Board({ session, boardId }: BoardProps) {
                     value={description}
                     onChange={updateDescription}
                     placeholder="Add a description"
-                    className="p-4 sm:w-full resize-none text-sm cursor-pointer border-0 bg-transparent focus:outline-0"
+                    className="p-4 md:w-full resize-none text-sm cursor-pointer border-0 bg-transparent focus:outline-0"
+                    readOnly={loading}
                 />
 
-                <KanbanBoard data={sections} boardId={boardId} />
+                {!loading && <KanbanBoard data={sections} boardId={boardId} />}
             </div>
         </>
     );

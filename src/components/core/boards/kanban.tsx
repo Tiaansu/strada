@@ -24,8 +24,9 @@ import {
 import { Tasks } from '@prisma/client';
 import { PlusIcon, ReloadIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useEffect, useState, useTransition } from 'react';
-import TaskModal from './task-modal';
 import { Separator } from '@/components/ui/separator';
+import TaskModal from './task-modal';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface KanbanBoardProps {
     data: ExtendedSection[];
@@ -177,16 +178,6 @@ export default function KanbanBoard(props: KanbanBoardProps) {
         setData(data);
     };
 
-    const onUpdateTaskDescription = (
-        sectionId: string,
-        task: Tasks,
-        text: string
-    ) => {
-        if (isLoading) return;
-
-        console.log(text);
-    };
-
     const onUpdate = (task: Tasks) => {
         const newData = [...data];
         const sectionIndex = newData.findIndex(
@@ -199,9 +190,9 @@ export default function KanbanBoard(props: KanbanBoardProps) {
         setData(newData);
     };
 
-    const onDeleteTask = (sectionId: string, task: Tasks) => {
+    const onDeleteTask = (task: Tasks) => {
         startTransition(async () => {
-            const res = await deleteTask(sectionId, task.id);
+            const res = await deleteTask(task.sectionId, task.id);
 
             if (res.error) {
                 toast({
@@ -214,7 +205,7 @@ export default function KanbanBoard(props: KanbanBoardProps) {
 
             const newData = [...data];
             const sectionIndex = newData.findIndex(
-                (section) => section.id === sectionId
+                (section) => section.id === task.sectionId
             );
             const taskIndex = newData[sectionIndex].Tasks.findIndex(
                 (t) => t.id === task.id
@@ -299,35 +290,47 @@ export default function KanbanBoard(props: KanbanBoardProps) {
                                                 )}
                                             </Button>
                                         </div>
-                                        {section.Tasks.map((task, index) => (
-                                            <Draggable
-                                                key={task.id}
-                                                draggableId={task.id}
-                                                index={index}
-                                            >
-                                                {(provided, snapshot) => (
-                                                    <TaskModal
-                                                        task={task}
-                                                        sectionId={section.id}
-                                                        boardId={boardId}
-                                                        loading={isLoading}
-                                                        provided={provided}
-                                                        snapshot={snapshot}
-                                                        setSelectedTask={
-                                                            setSelectedTask
-                                                        }
-                                                        selectedTask={
-                                                            selectedTask
-                                                        }
-                                                        onDeleteTask={
-                                                            onDeleteTask
-                                                        }
-                                                        onUpdate={onUpdate}
-                                                    />
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
+                                        <ScrollArea className="h-[35vh]">
+                                            {section.Tasks.map(
+                                                (task, index) => (
+                                                    <Draggable
+                                                        key={task.id}
+                                                        draggableId={task.id}
+                                                        index={index}
+                                                    >
+                                                        {(
+                                                            provided,
+                                                            snapshot
+                                                        ) => (
+                                                            <div
+                                                                ref={
+                                                                    provided.innerRef
+                                                                }
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                className={cn(
+                                                                    'p-2.5 mb-2.5 block w-full bg-primary/20 rounded-sm border-2 border-dashed border-primary/50',
+                                                                    snapshot.isDragging
+                                                                        ? 'cursor-grab'
+                                                                        : '!cursor-pointer'
+                                                                )}
+                                                                onClick={() =>
+                                                                    setSelectedTask(
+                                                                        task
+                                                                    )
+                                                                }
+                                                            >
+                                                                {task.title ===
+                                                                ''
+                                                                    ? 'Untitled'
+                                                                    : task.title}
+                                                            </div>
+                                                        )}
+                                                    </Draggable>
+                                                )
+                                            )}
+                                            {provided.placeholder}
+                                        </ScrollArea>
                                     </div>
                                 )}
                             </Droppable>
@@ -335,6 +338,14 @@ export default function KanbanBoard(props: KanbanBoardProps) {
                     ))}
                 </div>
             </DragDropContext>
+            <TaskModal
+                task={selectedTask}
+                boardId={boardId}
+                isLoading={isLoading}
+                onClose={() => setSelectedTask(undefined)}
+                onUpdate={onUpdate}
+                onDelete={onDeleteTask}
+            />
         </>
     );
 }

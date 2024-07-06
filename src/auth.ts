@@ -20,6 +20,7 @@ export const providerMap = providers.map((provider) => {
 });
 
 export const authConfig: NextAuthConfig = {
+    trustHost: true,
     session: {
         strategy: 'database',
     },
